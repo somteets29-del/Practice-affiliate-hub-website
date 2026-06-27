@@ -1,0 +1,69 @@
+{% extends 'admin/base.html' %}
+{% block title %}Products{% endblock %}
+{% block page_title %}Products ({{ products|length }}){% endblock %}
+
+{% block topbar_action %}
+  <a href="{{ url_for('admin_product_new') }}" class="btn btn-primary">+ Add Product</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Rating</th>
+          <th>Clicks</th>
+          <th>Featured</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in products %}
+        <tr>
+          <td>
+            {% if p.image_url %}
+            <img src="{{ p.image_url }}" alt="" class="product-thumb">
+            {% else %}
+            <div style="width:40px;height:40px;background:var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;">📦</div>
+            {% endif %}
+          </td>
+          <td>
+            <strong>{{ p.name[:60] }}{% if p.name|length > 60 %}…{% endif %}</strong>
+            {% if p.amazon_asin %}
+            <div style="font-size: 0.75rem; color: var(--muted);">ASIN: {{ p.amazon_asin }}</div>
+            {% endif %}
+          </td>
+          <td>{{ p.category.name if p.category else '—' }}</td>
+          <td>{% if p.price %}${{ '%.2f'|format(p.price) }}{% else %}—{% endif %}</td>
+          <td>{% if p.rating %}⭐ {{ p.rating }}{% else %}—{% endif %}</td>
+          <td><span class="badge badge-green">{{ p.click_count }}</span></td>
+          <td>
+            {% if p.is_featured %}
+            <span class="badge badge-orange">⭐ Yes</span>
+            {% else %}
+            <span class="badge badge-gray">No</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{{ url_for('admin_product_edit', pid=p.id) }}" class="btn btn-secondary btn-sm">Edit</a>
+            <form method="post" action="{{ url_for('admin_product_delete', pid=p.id) }}" style="display:inline"
+                  onsubmit="return confirm('Delete {{ p.name }}?')">
+              <button type="submit" class="btn btn-danger btn-sm">Del</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" style="text-align:center; color: var(--muted); padding: 3rem;">
+          No products yet. <a href="{{ url_for('admin_product_new') }}" style="color: var(--accent-light);">Add your first product →</a>
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

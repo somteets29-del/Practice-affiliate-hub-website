@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}AffiliateHub — Curated Amazon Picks{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container hero-inner">
+    <div class="hero-text">
+      <p class="hero-eyebrow">Honest Recommendations</p>
+      <h1>Find products<br><em>actually worth buying.</em></h1>
+      <p class="hero-sub">Every pick is researched, reviewed, and verified before we recommend it.</p>
+      <form action="{{ url_for('search') }}" method="get" class="hero-search">
+        <input type="search" name="q" placeholder="What are you looking for?">
+        <button type="submit">Search</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Browse by Category</h2>
+    <div class="category-grid">
+      {% for cat in categories %}
+      <a href="{{ url_for('category', slug=cat.slug) }}" class="category-card">
+        <span class="cat-icon">{{ cat.icon }}</span>
+        <span class="cat-name">{{ cat.name }}</span>
+        <span class="cat-count">{{ cat.products|length }} products</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED PRODUCTS -->
+{% if featured %}
+<section class="section section-alt">
+  <div class="container">
+    <h2 class="section-title">Featured Picks</h2>
+    <div class="product-grid">
+      {% for p in featured %}
+      {% include 'partials/product_card.html' %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- RECENT ARTICLES -->
+{% if recent_articles %}
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Latest Guides</h2>
+    <div class="article-grid">
+      {% for art in recent_articles %}
+      <a href="{{ url_for('article', slug=art.slug) }}" class="article-card">
+        {% if art.cover_image %}
+        <div class="article-img">
+          <img src="{{ art.cover_image }}" alt="{{ art.title }}" loading="lazy">
+        </div>
+        {% endif %}
+        <div class="article-body">
+          {% if art.category %}
+          <span class="article-cat">{{ art.category.icon }} {{ art.category.name }}</span>
+          {% endif %}
+          <h3>{{ art.title }}</h3>
+          <p>{{ art.excerpt }}</p>
+          <span class="article-read">Read guide →</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- TOP PRODUCTS (Most Clicked) -->
+{% if top_products %}
+<section class="section section-alt">
+  <div class="container">
+    <h2 class="section-title">Most Popular</h2>
+    <div class="product-grid">
+      {% for p in top_products[:4] %}
+      {% include 'partials/product_card.html' %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Admin{% endblock %} — AffiliateHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --border: #2a2d3e;
+      --accent: #6c63ff;
+      --accent-light: #8b84ff;
+      --text: #e2e4f0;
+      --muted: #888ba0;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+
+    /* Sidebar */
+    .sidebar { width: 220px; background: var(--surface); border-right: 1px solid var(--border); padding: 1.5rem 0; flex-shrink: 0; }
+    .sidebar-logo { padding: 0 1.5rem 1.5rem; font-weight: 700; font-size: 1.1rem; color: var(--accent-light); border-bottom: 1px solid var(--border); }
+    .sidebar-logo span { color: var(--text); }
+    .sidebar-nav { margin-top: 1rem; }
+    .sidebar-nav a { display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 1.5rem; color: var(--muted); text-decoration: none; font-size: 0.9rem; transition: all 0.15s; }
+    .sidebar-nav a:hover, .sidebar-nav a.active { background: rgba(108,99,255,0.12); color: var(--text); }
+    .sidebar-nav a .icon { width: 1.2rem; text-align: center; }
+    .sidebar-divider { border: none; border-top: 1px solid var(--border); margin: 0.75rem 0; }
+    .sidebar-nav .danger:hover { background: rgba(239,68,68,0.1); color: var(--danger); }
+
+    /* Main */
+    .admin-main { flex: 1; overflow-y: auto; }
+    .admin-topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    .admin-topbar h1 { font-size: 1.1rem; font-weight: 600; }
+    .admin-content { padding: 2rem; max-width: 1200px; }
+
+    /* Cards */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .card-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.5rem; }
+    .card-value { font-size: 2rem; font-weight: 700; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    thead { background: rgba(255,255,255,0.03); }
+    th { padding: 0.75rem 1rem; text-align: left; color: var(--muted); font-weight: 500; border-bottom: 1px solid var(--border); }
+    td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    .product-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; }
+
+    /* Forms */
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 0.8rem; color: var(--muted); font-weight: 500; }
+    input[type=text], input[type=number], input[type=password], input[type=url], select, textarea {
+      background: var(--bg); border: 1px solid var(--border); color: var(--text);
+      padding: 0.6rem 0.9rem; border-radius: 7px; font-size: 0.9rem; font-family: inherit; width: 100%;
+      transition: border-color 0.15s;
+    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 140px; }
+    .form-hint { font-size: 0.75rem; color: var(--muted); }
+
+    /* Checkboxes */
+    .checkbox-row { display: flex; align-items: center; gap: 0.6rem; }
+    .checkbox-row input { width: auto; }
+    .checkbox-row label { font-size: 0.9rem; color: var(--text); margin: 0; }
+
+    /* Product checkboxes for article form */
+    .product-checklist { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.6rem; max-height: 300px; overflow-y: auto; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; }
+    .product-check-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; border-radius: 5px; }
+    .product-check-item:hover { background: rgba(255,255,255,0.04); }
+    .product-check-item input { width: auto; }
+    .product-check-item label { font-size: 0.85rem; color: var(--text); cursor: pointer; }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.6rem 1.1rem; border-radius: 7px; font-size: 0.875rem; font-weight: 500; cursor: pointer; border: none; text-decoration: none; transition: all 0.15s; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-light); }
+    .btn-secondary { background: var(--border); color: var(--text); }
+    .btn-secondary:hover { background: #3a3d50; }
+    .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+    .btn-danger:hover { background: rgba(239,68,68,0.1); }
+    .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.8rem; }
+
+    /* Badges */
+    .badge { display: inline-block; padding: 0.2rem 0.55rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+    .badge-green { background: rgba(34,197,94,0.15); color: var(--success); }
+    .badge-gray { background: rgba(255,255,255,0.08); color: var(--muted); }
+    .badge-orange { background: rgba(245,158,11,0.15); color: var(--warning); }
+
+    /* Flash */
+    .flash { padding: 0.75rem 1.5rem; font-size: 0.875rem; }
+    .flash-success { background: rgba(34,197,94,0.1); color: var(--success); border-left: 3px solid var(--success); }
+    .flash-error   { background: rgba(239,68,68,0.1);  color: var(--danger);  border-left: 3px solid var(--danger); }
+    .flash-info    { background: rgba(108,99,255,0.1); color: var(--accent-light); border-left: 3px solid var(--accent); }
+
+    /* Chart bar (CSS only sparkline) */
+    .mini-bar-chart { display: flex; align-items: flex-end; gap: 3px; height: 60px; }
+    .mini-bar { flex: 1; background: var(--accent); border-radius: 3px 3px 0 0; opacity: 0.8; min-height: 4px; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .admin-content { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">Affiliate<span>Hub</span> Admin</div>
+  <nav class="sidebar-nav">
+    <a href="{{ url_for('admin_dashboard') }}" class="{{ 'active' if request.endpoint == 'admin_dashboard' }}">
+      <span class="icon">📊</span> Dashboard
+    </a>
+    <a href="{{ url_for('admin_products') }}" class="{{ 'active' if 'product' in request.endpoint }}">
+      <span class="icon">📦</span> Products
+    </a>
+    <a href="{{ url_for('admin_articles') }}" class="{{ 'active' if 'article' in request.endpoint }}">
+      <span class="icon">📝</span> Articles
+    </a>
+    <a href="{{ url_for('admin_categories') }}" class="{{ 'active' if 'categor' in request.endpoint }}">
+      <span class="icon">🗂️</span> Categories
+    </a>
+    <hr class="sidebar-divider">
+    <a href="{{ url_for('index') }}" target="_blank">
+      <span class="icon">🌐</span> View Site
+    </a>
+    <a href="{{ url_for('admin_logout') }}" class="danger">
+      <span class="icon">🚪</span> Log Out
+    </a>
+  </nav>
+</aside>
+
+<div class="admin-main">
+  <div class="admin-topbar">
+    <h1>{% block page_title %}Admin{% endblock %}</h1>
+    <div>{% block topbar_action %}{% endblock %}</div>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="flash flash-{{ cat }}">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="admin-content">
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+</body>
+</html>

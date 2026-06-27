@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login — AffiliateHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #0f1117; color: #e2e4f0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .login-card { background: #1a1d27; border: 1px solid #2a2d3e; border-radius: 14px; padding: 2.5rem; width: 100%; max-width: 380px; }
+    .login-logo { font-size: 1.3rem; font-weight: 700; color: #8b84ff; margin-bottom: 0.25rem; }
+    .login-logo span { color: #e2e4f0; }
+    .login-card h2 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .login-card p { color: #888ba0; font-size: 0.875rem; margin-bottom: 2rem; }
+    label { display: block; font-size: 0.8rem; color: #888ba0; font-weight: 500; margin-bottom: 0.4rem; }
+    input[type=password] { width: 100%; background: #0f1117; border: 1px solid #2a2d3e; color: #e2e4f0; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.95rem; margin-bottom: 1.25rem; }
+    input:focus { outline: none; border-color: #6c63ff; }
+    button { width: 100%; background: #6c63ff; color: #fff; border: none; padding: 0.75rem; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+    button:hover { background: #8b84ff; }
+    .flash-error { color: #ef4444; font-size: 0.85rem; margin-bottom: 1rem; }
+    .back-link { display: block; text-align: center; margin-top: 1.25rem; color: #888ba0; font-size: 0.8rem; text-decoration: none; }
+    .back-link:hover { color: #e2e4f0; }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <div class="login-logo">Affiliate<span>Hub</span></div>
+    <h2>Admin Login</h2>
+    <p>Enter your password to access the dashboard.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="flash-{{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="post">
+      <label for="password">Password</label>
+      <input type="password" name="password" id="password" placeholder="••••••••••" autofocus required>
+      <button type="submit">Sign In →</button>
+    </form>
+    <a href="{{ url_for('index') }}" class="back-link">← Back to site</a>
+  </div>
+</body>
+</html>

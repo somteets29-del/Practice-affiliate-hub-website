@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}{% if query %}Search: {{ query }}{% else %}All Products{% endif %} — AffiliateHub{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 2rem;">
+
+  <div class="search-header">
+    <h1>
+      {% if query %}Results for <em>"{{ query }}"</em>
+      {% else %}All Products{% endif %}
+    </h1>
+    <p class="search-count">{{ products|length }} product{{ 's' if products|length != 1 }}</p>
+  </div>
+
+  <!-- Filters Bar -->
+  <form class="filters-bar" method="get" action="{{ url_for('search') }}">
+    <input type="hidden" name="q" value="{{ query }}">
+
+    <select name="category" onchange="this.form.submit()">
+      <option value="">All Categories</option>
+      {% for cat in categories %}
+      <option value="{{ cat.id }}" {% if selected_cat == cat.id %}selected{% endif %}>
+        {{ cat.icon }} {{ cat.name }}
+      </option>
+      {% endfor %}
+    </select>
+
+    <select name="sort" onchange="this.form.submit()">
+      <option value="relevance" {% if sort=='relevance' %}selected{% endif %}>Relevance</option>
+      <option value="popular"   {% if sort=='popular'   %}selected{% endif %}>Most Popular</option>
+      <option value="rating"    {% if sort=='rating'    %}selected{% endif %}>Highest Rated</option>
+      <option value="price_asc" {% if sort=='price_asc' %}selected{% endif %}>Price: Low → High</option>
+      <option value="price_desc"{% if sort=='price_desc'%}selected{% endif %}>Price: High → Low</option>
+    </select>
+  </form>
+
+  {% if products %}
+  <div class="product-grid">
+    {% for p in products %}
+    {% include 'partials/product_card.html' %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">🔍</div>
+    <h2>No products found</h2>
+    <p>Try a different search term or browse a category.</p>
+    <a href="{{ url_for('index') }}" class="btn btn-primary">Back to Home</a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends 'admin/base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- Stats Row -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="card-title">Total Clicks</div>
+    <div class="card-value">{{ '{:,}'.format(total_clicks) }}</div>
+    <div style="color: var(--success); font-size: 0.8rem; margin-top: 0.25rem;">All-time affiliate clicks</div>
+  </div>
+  <div class="stat-card">
+    <div class="card-title">Products</div>
+    <div class="card-value">{{ total_products }}</div>
+    <div style="color: var(--muted); font-size: 0.8rem; margin-top: 0.25rem;">In database</div>
+  </div>
+  <div class="stat-card">
+    <div class="card-title">Articles</div>
+    <div class="card-value">{{ total_articles }}</div>
+    <div style="color: var(--muted); font-size: 0.8rem; margin-top: 0.25rem;">Published guides</div>
+  </div>
+  <div class="stat-card">
+    <div class="card-title">Article Views</div>
+    <div class="card-value">{{ '{:,}'.format(total_views) }}</div>
+    <div style="color: var(--muted); font-size: 0.8rem; margin-top: 0.25rem;">Total page views</div>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+
+  <!-- Click Chart -->
+  <div class="card">
+    <div class="card-title">Clicks — Last 14 Days</div>
+    {% if daily_clicks %}
+    {% set max_count = daily_clicks | map(attribute='count') | max %}
+    <div class="mini-bar-chart" style="height: 80px; margin-top: 1rem;">
+      {% for row in daily_clicks %}
+      {% set height = ((row.count / max_count) * 100) | int %}
+      <div class="mini-bar" style="height: {{ height }}%;"
+           title="{{ row.day }}: {{ row.count }} clicks"></div>
+      {% endfor %}
+    </div>
+    <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--muted); margin-top: 0.4rem;">
+      {% if daily_clicks %}
+      <span>{{ daily_clicks[0].day }}</span>
+      <span>{{ daily_clicks[-1].day }}</span>
+      {% endif %}
+    </div>
+    {% else %}
+    <p style="color: var(--muted); font-size: 0.875rem; margin-top: 1rem;">No clicks yet. Share your affiliate links to get started!</p>
+    {% endif %}
+  </div>
+
+  <!-- Top Products -->
+  <div class="card">
+    <div class="card-title">Top Products by Clicks</div>
+    <div style="margin-top: 0.75rem;">
+      {% for p in top_products[:6] %}
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border);">
+        <span style="font-size: 0.85rem; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 1rem;">{{ p.name }}</span>
+        <span class="badge badge-green">{{ p.click_count }}</span>
+      </div>
+      {% else %}
+      <p style="color: var(--muted); font-size: 0.875rem;">No clicks tracked yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+<!-- Recent Clicks -->
+<div class="card" style="margin-top: 1.5rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <div class="card-title" style="margin: 0;">Recent Clicks</div>
+  </div>
+  {% if recent_clicks %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Time</th>
+          <th>IP</th>
+          <th>Referrer</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for click in recent_clicks %}
+        <tr>
+          <td>{{ click.product.name if click.product else '—' }}</td>
+          <td style="color: var(--muted); font-size: 0.8rem;">{{ click.timestamp.strftime('%b %d, %H:%M') }}</td>
+          <td style="color: var(--muted); font-size: 0.8rem;">{{ click.ip_address or '—' }}</td>
+          <td style="color: var(--muted); font-size: 0.8rem; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            {{ click.referrer[:60] + '…' if click.referrer and click.referrer|length > 60 else (click.referrer or 'Direct') }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p style="color: var(--muted); font-size: 0.875rem;">No clicks recorded yet.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

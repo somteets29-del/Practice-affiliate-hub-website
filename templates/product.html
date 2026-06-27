@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }} — AffiliateHub{% endblock %}
+{% block meta_description %}{{ product.description[:160] if product.description else product.name }}{% endblock %}
+{% block og_image %}{{ product.image_url }}{% endblock %}
+
+{% block content %}
+<div class="container product-page">
+
+  <div class="product-detail">
+    <!-- Image -->
+    <div class="product-detail-img">
+      {% if product.image_url %}
+      <img src="{{ product.image_url }}" alt="{{ product.name }}">
+      {% else %}
+      <div class="img-placeholder">📦</div>
+      {% endif %}
+    </div>
+
+    <!-- Info -->
+    <div class="product-detail-info">
+      {% if product.category %}
+      <a href="{{ url_for('category', slug=product.category.slug) }}" class="product-cat">
+        {{ product.category.icon }} {{ product.category.name }}
+      </a>
+      {% endif %}
+
+      <h1>{{ product.name }}</h1>
+
+      {% if product.rating %}
+      <div class="product-rating large">
+        <span class="stars">{{ '★' * (product.rating|int) }}{{ '☆' * (5 - product.rating|int) }}</span>
+        <span class="rating-num">{{ product.rating }} out of 5 — {{ '{:,}'.format(product.review_count) }} reviews on Amazon</span>
+      </div>
+      {% endif %}
+
+      {% if product.price %}
+      <div class="product-price large">${{ '%.2f'|format(product.price) }}</div>
+      {% endif %}
+
+      {% if product.description %}
+      <p class="product-desc">{{ product.description }}</p>
+      {% endif %}
+
+      {% if product.tag_list %}
+      <div class="product-tags">
+        {% for tag in product.tag_list %}
+        <a href="{{ url_for('search', q=tag) }}" class="tag">{{ tag }}</a>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <a href="{{ url_for('track_click', product_id=product.id) }}"
+         class="btn btn-primary btn-large" target="_blank" rel="noopener sponsored">
+        🛒 View on Amazon
+      </a>
+      <p class="affiliate-note">Opens on Amazon. We may earn a commission at no extra cost to you.</p>
+    </div>
+  </div>
+
+  <!-- Related Products -->
+  {% if related %}
+  <section style="margin-top: 4rem;">
+    <h2 class="section-title">You Might Also Like</h2>
+    <div class="product-grid">
+      {% for p in related %}
+      {% include 'partials/product_card.html' %}
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+</div>
+{% endblock %}

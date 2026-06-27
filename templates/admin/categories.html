@@ -1,0 +1,48 @@
+{% extends 'admin/base.html' %}
+{% block title %}Categories{% endblock %}
+{% block page_title %}Categories{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+
+  <!-- Add Category Form -->
+  <div class="card">
+    <div class="card-title">Add New Category</div>
+    <form method="post" style="margin-top: 1rem;">
+      <div class="form-group" style="margin-bottom: 1rem;">
+        <label>Name *</label>
+        <input type="text" name="name" required placeholder="e.g. Home & Kitchen">
+      </div>
+      <div class="form-group" style="margin-bottom: 1rem;">
+        <label>Icon (emoji)</label>
+        <input type="text" name="icon" placeholder="🏠" maxlength="10" value="🛍️">
+      </div>
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+        <label>Description</label>
+        <textarea name="description" style="min-height: 80px;" placeholder="Short description for this category…"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Add Category</button>
+    </form>
+  </div>
+
+  <!-- Existing Categories -->
+  <div class="card">
+    <div class="card-title">All Categories</div>
+    <div style="margin-top: 1rem;">
+      {% for cat in categories %}
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border);">
+        <div>
+          <span style="font-size: 1.3rem;">{{ cat.icon }}</span>
+          <strong style="margin-left: 0.5rem;">{{ cat.name }}</strong>
+          <div style="font-size: 0.75rem; color: var(--muted);">/category/{{ cat.slug }} · {{ cat.products|length }} products</div>
+        </div>
+        <a href="{{ url_for('category', slug=cat.slug) }}" class="btn btn-secondary btn-sm" target="_blank">View</a>
+      </div>
+      {% else %}
+      <p style="color: var(--muted);">No categories yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'admin/base.html' %}
+{% block title %}Articles{% endblock %}
+{% block page_title %}Articles ({{ articles|length }}){% endblock %}
+
+{% block topbar_action %}
+  <a href="{{ url_for('admin_article_new') }}" class="btn btn-primary">+ New Article</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Status</th>
+          <th>Views</th>
+          <th>Products</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for art in articles %}
+        <tr>
+          <td>
+            <strong>{{ art.title[:70] }}{% if art.title|length > 70 %}…{% endif %}</strong>
+            <div style="font-size:0.75rem; color: var(--muted);">/article/{{ art.slug[:40] }}…</div>
+          </td>
+          <td>{{ art.category.name if art.category else '—' }}</td>
+          <td>
+            {% if art.is_published %}
+            <span class="badge badge-green">Published</span>
+            {% else %}
+            <span class="badge badge-gray">Draft</span>
+            {% endif %}
+          </td>
+          <td>{{ art.view_count }}</td>
+          <td>{{ art.article_products|length }}</td>
+          <td style="color: var(--muted); font-size: 0.8rem;">{{ art.created_at.strftime('%b %d, %Y') }}</td>
+          <td>
+            {% if art.is_published %}
+            <a href="{{ url_for('article', slug=art.slug) }}" class="btn btn-secondary btn-sm" target="_blank">View</a>
+            {% endif %}
+            <a href="{{ url_for('admin_article_edit', aid=art.id) }}" class="btn btn-secondary btn-sm">Edit</a>
+            <form method="post" action="{{ url_for('admin_article_delete', aid=art.id) }}" style="display:inline"
+                  onsubmit="return confirm('Delete this article?')">
+              <button type="submit" class="btn btn-danger btn-sm">Del</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" style="text-align:center; color: var(--muted); padding: 3rem;">
+          No articles yet. <a href="{{ url_for('admin_article_new') }}" style="color: var(--accent-light);">Write your first guide →</a>
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

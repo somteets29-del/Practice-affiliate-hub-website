@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ article.meta_title or article.title }} — AffiliateHub{% endblock %}
+{% block meta_description %}{{ article.meta_description or article.excerpt }}{% endblock %}
+
+{# Pinterest / Open Graph #}
+{% block og_title %}{{ article.title }}{% endblock %}
+{% block og_description %}{{ article.excerpt }}{% endblock %}
+{% block og_image %}{{ article.pinterest_image or article.cover_image }}{% endblock %}
+
+{% block head %}
+{# Pinterest Rich Pins schema #}
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="{{ article.created_at.isoformat() }}">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "{{ article.title | e }}",
+  "description": "{{ article.excerpt | e }}",
+  "image": "{{ article.cover_image }}",
+  "datePublished": "{{ article.created_at.isoformat() }}",
+  "publisher": { "@type": "Organization", "name": "AffiliateHub" }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<article class="article-page">
+
+  {# Hero — 1200×630 for og, Pinterest pin uses pinterest_image (2:3) #}
+  {% if article.cover_image %}
+  <div class="article-hero">
+    <img src="{{ article.cover_image }}" alt="{{ article.title }}"
+         data-pin-url="{{ request.url }}"
+         data-pin-description="{{ article.title }} — {{ article.excerpt }}">
+    {# Hidden Pinterest 2:3 image — Pinterest prefers this ratio #}
+    {% if article.pinterest_image %}
+    <img src="{{ article.pinterest_image }}" alt="{{ article.title }}"
+         style="display:none" data-pin-url="{{ request.url }}"
+         data-pin-description="{{ article.title }}">
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <div class="container article-layout">
+    <div class="article-main">
+
+      <header class="article-header">
+        {% if article.category %}
+        <a href="{{ url_for('category', slug=article.category.slug) }}" class="article-cat">
+          {{ article.category.icon }} {{ article.category.name }}
+        </a>
+        {% endif %}
+        <h1>{{ article.title }}</h1>
+        {% if article.excerpt %}
+        <p class="article-excerpt">{{ article.excerpt }}</p>
+        {% endif %}
+        <div class="article-meta">
+          📅 {{ article.created_at.strftime('%B %d, %Y') }} &nbsp;·&nbsp;
+          👁 {{ article.view_count }} views
+        </div>
+      </header>
+
+      {# Pinterest Save Button — appears on hover over images #}
+      <script async defer src="//assets.pinterest.com/js/pinit.js"></script>
+
+      <div class="article-content">
+        {{ article.content | safe }}
+      </div>
+
+    </div>
+
+    {# SIDEBAR: Products in this article #}
+    {% if products %}
+    <aside class="article-sidebar">
+      <h3>Products in This Guide</h3>
+      {% for p in products %}
+      <div class="sidebar-product">
+        {% if p.image_url %}
+        <img src="{{ p.image_url }}" alt="{{ p.name }}" loading="lazy">
+        {% endif %}
+        <div>
+          <div class="sidebar-product-name">{{ p.name }}</div>
+          {% if p.price %}
+          <div class="sidebar-product-price">${{ '%.2f'|format(p.price) }}</div>
+          {% endif %}
+          <a href="{{ url_for('track_click', product_id=p.id, article=article.id) }}"
+             class="btn btn-sm" target="_blank" rel="noopener sponsored">
+             Amazon →
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </aside>
+    {% endif %}
+
+  </div>
+
+  {# Full product section below article #}
+  {% if products %}
+  <section class="section container">
+    <h2 class="section-title">Products Mentioned</h2>
+    <div class="product-grid">
+      {% for p in products %}
+      {% include 'partials/product_card.html' %}
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+</article>
+{% endblock %}

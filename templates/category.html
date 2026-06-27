@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}{{ category.name }} — AffiliateHub{% endblock %}
+{% block meta_description %}{{ category.description }}{% endblock %}
+
+{% block content %}
+<div class="category-hero">
+  <div class="container">
+    <span class="cat-hero-icon">{{ category.icon }}</span>
+    <h1>{{ category.name }}</h1>
+    {% if category.description %}<p>{{ category.description }}</p>{% endif %}
+  </div>
+</div>
+
+<div class="container" style="padding: 2rem 1rem;">
+
+  {% if articles %}
+  <h2 class="section-title">Guides & Articles</h2>
+  <div class="article-grid" style="margin-bottom: 3rem;">
+    {% for art in articles %}
+    <a href="{{ url_for('article', slug=art.slug) }}" class="article-card">
+      {% if art.cover_image %}
+      <div class="article-img"><img src="{{ art.cover_image }}" alt="{{ art.title }}" loading="lazy"></div>
+      {% endif %}
+      <div class="article-body">
+        <h3>{{ art.title }}</h3>
+        <p>{{ art.excerpt }}</p>
+        <span class="article-read">Read guide →</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if products %}
+  <h2 class="section-title">Products ({{ products|length }})</h2>
+  <div class="product-grid">
+    {% for p in products %}
+    {% include 'partials/product_card.html' %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">{{ category.icon }}</div>
+    <h2>No products yet</h2>
+    <p>Check back soon — we're adding picks for {{ category.name }} now.</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

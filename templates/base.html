@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}AffiliateHub{% endblock %}</title>
+
+  {# SEO #}
+  <meta name="description" content="{% block meta_description %}Curated Amazon picks with honest reviews{% endblock %}">
+
+  {# Open Graph / Pinterest #}
+  <meta property="og:title" content="{% block og_title %}AffiliateHub{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Curated product guides{% endblock %}">
+  <meta property="og:image" content="{% block og_image %}{% endblock %}">
+  <meta property="og:type" content="website">
+
+  {# Pinterest verification + rich pins #}
+  <meta name="p:domain_verify" content="YOUR_PINTEREST_VERIFY_CODE">
+
+  {# Fonts: Inter for body, Fraunces for display #}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+<!-- NAVBAR -->
+<header class="navbar">
+  <div class="container nav-inner">
+    <a href="{{ url_for('index') }}" class="logo">Affiliate<span>Hub</span></a>
+
+    <form class="nav-search" action="{{ url_for('search') }}" method="get">
+      <input type="search" name="q" placeholder="Search products…" autocomplete="off"
+             value="{{ request.args.get('q', '') }}">
+      <button type="submit">🔍</button>
+    </form>
+
+    <nav class="nav-links">
+      {% for cat in categories_nav %}
+        <a href="{{ url_for('category', slug=cat.slug) }}">{{ cat.icon }} {{ cat.name }}</a>
+      {% endfor %}
+    </nav>
+
+    <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+  </div>
+</header>
+
+<!-- FLASH MESSAGES -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for cat, msg in messages %}
+    <div class="flash flash-{{ cat }}">{{ msg }}</div>
+  {% endfor %}
+{% endwith %}
+
+<!-- MAIN -->
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <div>
+      <div class="logo">Affiliate<span>Hub</span></div>
+      <p class="footer-tagline">Curated picks. Honest reviews. Real value.</p>
+    </div>
+    <div class="footer-cats">
+      <strong>Categories</strong>
+      {% for cat in categories_nav %}
+        <a href="{{ url_for('category', slug=cat.slug) }}">{{ cat.name }}</a>
+      {% endfor %}
+    </div>
+    <div class="footer-legal">
+      <p>AffiliateHub is a participant in the Amazon Services LLC Associates Program.
+      We earn from qualifying purchases at no extra cost to you.</p>
+      <p>© {{ 2024 }} AffiliateHub</p>
+    </div>
+  </div>
+</footer>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

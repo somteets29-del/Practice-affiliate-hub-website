@@ -1,0 +1,94 @@
+{% extends 'admin/base.html' %}
+{% block title %}{{ 'Edit' if product else 'New' }} Product{% endblock %}
+{% block page_title %}{{ 'Edit Product' if product else 'Add New Product' }}{% endblock %}
+
+{% block topbar_action %}
+  <a href="{{ url_for('admin_products') }}" class="btn btn-secondary">← Back</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <form method="post">
+    <div class="form-grid">
+
+      <div class="form-group full">
+        <label>Product Name *</label>
+        <input type="text" name="name" value="{{ product.name if product else '' }}" required
+               placeholder="e.g. Instant Pot Duo 7-in-1 Electric Pressure Cooker">
+      </div>
+
+      <div class="form-group full">
+        <label>Description</label>
+        <textarea name="description" placeholder="Short, honest product description…">{{ product.description if product else '' }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Amazon ASIN</label>
+        <input type="text" name="amazon_asin" value="{{ product.amazon_asin if product else '' }}"
+               placeholder="B00FLYWNYQ" maxlength="20">
+        <span class="form-hint">Find it in the Amazon product URL: /dp/ASIN</span>
+      </div>
+
+      <div class="form-group">
+        <label>Category</label>
+        <select name="category_id">
+          <option value="">— Select Category —</option>
+          {% for cat in categories %}
+          <option value="{{ cat.id }}" {% if product and product.category_id == cat.id %}selected{% endif %}>
+            {{ cat.icon }} {{ cat.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Price (USD)</label>
+        <input type="number" name="price" step="0.01" min="0"
+               value="{{ product.price if product and product.price else '' }}" placeholder="29.99">
+      </div>
+
+      <div class="form-group">
+        <label>Amazon Rating (0–5)</label>
+        <input type="number" name="rating" step="0.1" min="0" max="5"
+               value="{{ product.rating if product else '4.5' }}">
+      </div>
+
+      <div class="form-group">
+        <label>Number of Reviews</label>
+        <input type="number" name="review_count" min="0"
+               value="{{ product.review_count if product else '0' }}" placeholder="1234">
+      </div>
+
+      <div class="form-group full">
+        <label>Image URL</label>
+        <input type="url" name="image_url" value="{{ product.image_url if product else '' }}"
+               placeholder="https://images-na.ssl-images-amazon.com/images/I/...">
+        <span class="form-hint">Right-click the product image on Amazon → Copy Image Address</span>
+      </div>
+
+      <div class="form-group full">
+        <label>Tags (comma-separated)</label>
+        <input type="text" name="tags" value="{{ product.tags if product else '' }}"
+               placeholder="kitchen, gadget, pressure cooker, instant pot">
+        <span class="form-hint">Used for search and related products</span>
+      </div>
+
+      <div class="form-group full">
+        <div class="checkbox-row">
+          <input type="checkbox" name="is_featured" id="is_featured"
+                 {% if product and product.is_featured %}checked{% endif %}>
+          <label for="is_featured">⭐ Feature this product on the homepage</label>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="margin-top: 2rem; display: flex; gap: 0.75rem;">
+      <button type="submit" class="btn btn-primary">
+        {% if product %}Save Changes{% else %}Add Product{% endif %}
+      </button>
+      <a href="{{ url_for('admin_products') }}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
